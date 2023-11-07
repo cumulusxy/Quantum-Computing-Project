@@ -15,7 +15,7 @@ class QSystem:
 class AQCSystem(QSystem):
     def __init__(self, init_state, hamiltonian_lis, time_schedule, dimless_time_lis, tf):
         time_lis = dimless_time_lis * tf
-        time_schedule_lis=[lambda x,*args: time_schedule(x,tf,*args)[i] for i in range(len(hamiltonian_lis))]
+        time_schedule_lis=[lambda x,*args,i=i: time_schedule(x,tf,*args)[i] for i in range(len(hamiltonian_lis))]
         hamiltonian = [[ham, sch] for ham, sch in zip(hamiltonian_lis, time_schedule_lis)]
         super().__init__(init_state, hamiltonian, time_lis)
 
