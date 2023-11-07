@@ -20,8 +20,8 @@ class AQCSystem(QSystem):
         super().__init__(init_state, hamiltonian, time_lis)
 
 
-def close_evolve(initState, hamiltonian, timeLis):
-    objLis = qt.mesolve(hamiltonian, initState, timeLis, [], [])
+def close_evolve(initState, hamiltonian, time_lis):
+    objLis = qt.mesolve(hamiltonian, initState, time_lis, [], [])
     stateLis = [state for state in objLis.states]
     return np.array(stateLis)
 
