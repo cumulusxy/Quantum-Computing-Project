@@ -26,7 +26,7 @@ def close_evolve(initState, hamiltonian, time_lis):
     return np.array(stateLis)
 
 def simple_time_schedule(x, tf, *args):
-    return (tf - x) / tf, x / tf
+    return (tf-x)/tf, x/tf
 
 def optimal_time_schedule(x, tf, n, *args):
     n=2
