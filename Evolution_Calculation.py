@@ -15,7 +15,7 @@ class QSystem:
 class AQCSystem(QSystem):
     def __init__(self, init_state, hamiltonian_lis, time_schedule, dimless_time_lis, tf):
         time_lis = dimless_time_lis * tf
-        time_schedule_lis=[lambda x,*args,i=i: time_schedule(x,tf,*args)[i] for i in range(len(hamiltonian_lis))]
+        time_schedule_lis=[lambda x,*args,i=i: time_schedule(x,tf,i,*args) for i in range(len(hamiltonian_lis))]
         hamiltonian = [[ham, sch] for ham, sch in zip(hamiltonian_lis, time_schedule_lis)]
         super().__init__(init_state, hamiltonian, time_lis)
 
@@ -25,15 +25,28 @@ def close_evolve(initState, hamiltonian, time_lis):
     stateLis = [state for state in objLis.states]
     return np.array(stateLis)
 
-def simple_time_schedule(x, tf, *args):
-    return (tf-x)/tf, x/tf
+def simple_time_schedule(x, tf, coeff_pos, *args):
+    if coeff_pos == 0:
+        return (tf-x)/tf
+    elif coeff_pos == 1:
+         return x/tf
 
-def optimal_time_schedule(x, tf, n, *args):
-    n=2
+def optimal_time_schedule(x, tf, coeff_pos,n, *args):
     s = x / tf
-    a = 1 / 2 - 1 / (2 * np.sqrt(n - 1)) * np.tan((2 * s - 1) * np.arctan(np.sqrt(n - 1)))
-    b = 1 / 2 + 1 / (2 * np.sqrt(n - 1)) * np.tan((2 * s - 1) * np.arctan(np.sqrt(n - 1)))
-    return a, b
+    if coeff_pos ==0:
+        return 1 / 2 - 1 / (2 * np.sqrt(n - 1)) * np.tan((2 * s - 1) * np.arctan(np.sqrt(n - 1)))
+    elif coeff_pos ==1:
+        return 1 / 2 + 1 / (2 * np.sqrt(n - 1)) * np.tan((2 * s - 1) * np.arctan(np.sqrt(n - 1)))
+
+def generate_dimless_timelis(tf_lis,sample_number1):
+    return tuple(np.linspace(0,1, int(sample_number1*tf_lis[i]/tf_lis[0])) for i in range(len((tf_lis))))
+
+
+def match_by_padding(*args):
+    args = [lst for lst in args]
+    len_lis=[len(lst) for lst in args]
+    len_max=np.max(len_lis)
+    return tuple(np.pad(args[i],(0,len_max-len_lis[i]),"edge") for i in range(len(args)))
 
 if __name__ == "__main__":
     state = qt.Qobj([[1], [0]])

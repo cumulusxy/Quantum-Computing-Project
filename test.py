@@ -1,6 +1,6 @@
 import qutip as qt
 import numpy as np
-tmax=7000
+tmax=700
 time_lis=np.linspace(0,1,300)
 n=3
 init_state = qt.Qobj([[np.sqrt(1 / n)], [np.sqrt((n - 1) / n)]])
