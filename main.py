@@ -7,7 +7,7 @@ from Evolution_Calculation import close_evolve, AQCSystem, simple_time_schedule,
 class RotatingState(Scene):
     def construct(self):
         #Plug in the numbers for a0
-        n = 30
+        n = 15
         tf0 = 100
         tf1 = 80
         dimless_time_lis0,dimless_time_lis1 = generate_dimless_timelis([tf0,tf1],50)
@@ -32,7 +32,7 @@ class RotatingState(Scene):
         dist1 = optimalGrover.state_lis-proj1*ground_state1
         self.err0 = np.array([np.matmul(np.transpose(simpleGrover.state_lis[i].conjugate()),dist0) for i in range(len(dist0))])[0]
         self.err1 = np.array([np.matmul(np.transpose(optimalGrover.state_lis[i].conjugate()),dist1) for i in range(len(dist1))])[0]
-        x0, y0, x1, y1, self.err0, self.err1 = match_by_padding(x0,y0,x1,y1, self.err0, self.err1)
+        x0, y0, x1, y1, err0, self.err1 = match_by_padding(x0,y0,x1,y1, self.err0, self.err1)
         # Generate the animation
         self.now_at = 0
         error0=DecimalNumber(self.err0[0][0][0])
