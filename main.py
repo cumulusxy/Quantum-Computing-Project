@@ -1,7 +1,7 @@
 import qutip as qt
 import numpy as np
 from manim import *
-from Evolution_Calculation import close_evolve, AQCSystem, simple_time_schedule, optimal_time_schedule, match_by_padding, generate_dimless_timelis
+from Evolution_Calculation import close_evolve, AQCSystem, simple_time_schedule, optimal_time_schedule, match_by_padding, generate_dimless_timelis, get_ground_state
 
 
 class RotatingState(Scene):
@@ -9,7 +9,7 @@ class RotatingState(Scene):
         #Plug in the numbers for a0
         n = 15
         tf0 = 100
-        tf1 = 65
+        tf1 = 80
         dimless_time_lis0,dimless_time_lis1 = generate_dimless_timelis([tf0,tf1],50)
         init_state = qt.Qobj([[np.sqrt(1 / n)], [np.sqrt((n - 1) / n)]])
         hmlta = qt.Qobj([[1-1/n, -np.sqrt(n-1)/n], [-np.sqrt(n-1)/n, 1-(n-1)/n]])
@@ -19,13 +19,38 @@ class RotatingState(Scene):
         optimalGrover = AQCSystem(init_state,[hmlta,hmltb],lambda x,tf,i,*args: optimal_time_schedule(x,tf,i,n,*args),dimless_time_lis1,tf1)
 
 
-        #Generate the animation
+
         a0=Arrow([-3,0,0],[-3+3*np.sqrt(1/n),3*np.sqrt((n - 1)/n),0])
         a1=Arrow([3,0,0],[3+3*np.sqrt(1/n),3*np.sqrt((n - 1)/n),0])
         x0, y0 = simpleGrover.slice_coordinate()
         x1, y1 = optimalGrover.slice_coordinate()
+        ground_state0 = simpleGrover.ground_state
+        ground_state1 = optimalGrover.ground_state
+        proj0 = np.array([np.transpose(ground_state0[i].conjugate())@simpleGrover.state_lis[i] for i in range(len(ground_state0))])
+        proj1 = np.array([np.transpose(ground_state1[i].conjugate())@optimalGrover.state_lis[i] for i in range(len(ground_state1))])
+        dist0 = simpleGrover.state_lis-proj0*ground_state0
+        dist1 = optimalGrover.state_lis-proj1*ground_state1
+        self.err0 = np.array([np.matmul(np.transpose(simpleGrover.state_lis[i].conjugate()),dist0) for i in range(len(dist0))])[0]
+        self.err1 = np.array([np.matmul(np.transpose(optimalGrover.state_lis[i].conjugate()),dist1) for i in range(len(dist1))])[0]
+        x0, y0, x1, y1, err0, self.err1 = match_by_padding(x0,y0,x1,y1, self.err0, self.err1)
+        # Generate the animation
+        self.now_at = 0
+        error0=DecimalNumber(self.err0[0][0][0])
+        error1=DecimalNumber(self.err1[1][0][0])
+        error0.set_x(-3)
+        error0.set_y(-3)
+        error1.set_x(3)
+        error1.set_y(-3)
+        self.add(error0)
+        self.add(error1)
+        def updateError0(mob):
+            mob.set_value(self.err0[self.now_at][0][0])
 
-        x0, y0, x1, y1 = match_by_padding(x0,y0,x1,y1)
+        def updateError1(mob):
+            mob.set_value(self.err1[self.now_at][0][0])
+
+        error0.add_updater(updateError0)
+        error1.add_updater(updateError1)
 
         self.len0=len(dimless_time_lis0)
         self.len1=len(dimless_time_lis1)
@@ -35,7 +60,6 @@ class RotatingState(Scene):
         dn0.set_y(-2)
         self.add(dn0)
         self.clock0 = 0
-        self.now_at = 0
         dn1 = DecimalNumber(0)
         dn1.set_x(3)
         dn1.set_y(-2)

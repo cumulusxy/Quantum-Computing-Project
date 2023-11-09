@@ -8,6 +8,7 @@ class QSystem:
         self.hamiltonian = hamiltonian
         self.time_lis = time_lis
         self.state_lis = close_evolve(init_state, hamiltonian, time_lis)
+        self.ground_state = get_ground_state(hamiltonian, time_lis)
 
     def slice_coordinate(self):
         return tuple(self.state_lis[:, i] for i in range(np.shape(self.state_lis)[1]))
@@ -47,6 +48,14 @@ def match_by_padding(*args):
     len_lis=[len(lst) for lst in args]
     len_max=np.max(len_lis)
     return tuple(np.pad(args[i],(0,len_max-len_lis[i]),"edge") for i in range(len(args)))
+
+def get_ground_state(hamiltonian,time_lis):
+    ham_t=np.array([np.zeros(np.shape(hamiltonian[0][0])) for _ in range(len(time_lis))])
+    for t in range(len(ham_t)):
+        for ham_pair in hamiltonian:
+            ham_t[t]+=ham_pair[0].data*ham_pair[1](t)
+    ground_state_lis=np.array([qt.Qobj(ham).groundstate()[1] for ham in ham_t])
+    return ground_state_lis
 
 if __name__ == "__main__":
     state = qt.Qobj([[1], [0]])
