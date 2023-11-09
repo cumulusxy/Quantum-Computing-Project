@@ -53,7 +53,7 @@ def get_ground_state(hamiltonian,time_lis):
     ham_t=np.array([np.zeros(np.shape(hamiltonian[0][0])) for _ in range(len(time_lis))])
     for t in range(len(ham_t)):
         for ham_pair in hamiltonian:
-            ham_t[t]+=ham_pair[0].data*ham_pair[1](t)
+            ham_t[t]+=ham_pair[0].data*ham_pair[1](time_lis[t])
     ground_state_lis=np.array([qt.Qobj(ham).groundstate()[1] for ham in ham_t])
     return ground_state_lis
 
