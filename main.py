@@ -7,10 +7,10 @@ from Evolution_Calculation import close_evolve, AQCSystem, simple_time_schedule,
 class RotatingState(Scene):
     def construct(self):
         #Plug in the numbers for a0
-        n = 15
-        tf0 = 100
-        tf1 = 80
-        dimless_time_lis0,dimless_time_lis1 = generate_dimless_timelis([tf0,tf1],50)
+        n = 30
+        tf0 = 200
+        tf1 = 100
+        dimless_time_lis0,dimless_time_lis1 = generate_dimless_timelis([tf0,tf1],900)
         init_state = qt.Qobj([[np.sqrt(1 / n)], [np.sqrt((n - 1) / n)]])
         hmlta = qt.Qobj([[1-1/n, -np.sqrt(n-1)/n], [-np.sqrt(n-1)/n, 1-(n-1)/n]])
         hmltb = qt.Qobj([[0,0], [0,1]])
@@ -55,7 +55,7 @@ class RotatingState(Scene):
         self.len0=len(dimless_time_lis0)
         self.len1=len(dimless_time_lis1)
 
-        dn0 = DecimalNumber(0)
+        dn0 = DecimalNumber(0,num_decimal_places=4)
         dn0.set_x(-3)
         dn0.set_y(-2)
         self.add(dn0)
@@ -73,6 +73,7 @@ class RotatingState(Scene):
 
         def update_timer1(mob, dt):
             if self.now_at<=self.len1:
+                print(dt)
                 self.clock1 += dt
                 mob.set_value(self.clock1)
 
@@ -86,15 +87,15 @@ class RotatingState(Scene):
                     a0,
                     angle=np.arctan(np.abs(y0[i][0]/x0[i][0]))-np.arctan(np.abs(y0[i-1][0]/x0[i-1][0])),
                     about_point=[-3,0,0],
-                    rate_funpic=linear
+                    rate_func=linear
             ),
             Rotate(
                 a1,
                 angle=np.arctan(np.abs(y1[i][0] / x1[i][0])) - np.arctan(np.abs(y1[i - 1][0] / x1[i - 1][0])),
                 about_point=[3, 0, 0],
                 rate_func=linear
-            )
-            )
+            ),
+            run_time = 0.05)
             self.now_at+=1
 
 if __name__=="__main__":
