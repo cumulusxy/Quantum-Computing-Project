@@ -8,7 +8,12 @@ class QSystem:
         self.hamiltonian = hamiltonian
         self.time_lis = time_lis
         self.state_lis = close_evolve(init_state, hamiltonian, time_lis)
-        self.ground_state = get_ground_state(hamiltonian, time_lis)
+        ham_t = np.array([np.zeros(np.shape(hamiltonian[0][0]),dtype=np.cdouble) for _ in range(len(time_lis))])
+        for t in range(len(ham_t)):
+            for ham_pair in hamiltonian:
+                ham_t[t] += ham_pair[0].data * ham_pair[1](time_lis[t])
+        self.inst_ham=ham_t
+        self.ground_state = np.array([qt.Qobj(ham).groundstate()[1] for ham in ham_t])
 
     def slice_coordinate(self):
         return tuple(self.state_lis[:, i] for i in range(np.shape(self.state_lis)[1]))
@@ -19,7 +24,11 @@ class AQCSystem(QSystem):
         time_schedule_lis=[lambda x,*args,i=i: time_schedule(x,tf,i,*args) for i in range(len(hamiltonian_lis))]
         hamiltonian = [[ham, sch] for ham, sch in zip(hamiltonian_lis, time_schedule_lis)]
         super().__init__(init_state, hamiltonian, time_lis)
-
+        self.energy_gap=np.zeros(len(self.inst_ham))
+        for i in range(len(self.inst_ham)):
+            eig0,eig1=qt.Qobj(self.inst_ham[i]).eigenenergies(sparse=False, sort='low', eigvals=2,)
+            delta=eig1-eig0
+            self.energy_gap[i]=delta
 
 def close_evolve(initState, hamiltonian, time_lis):
     objLis = qt.mesolve(hamiltonian, initState, time_lis, [], [])
