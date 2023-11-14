@@ -7,10 +7,10 @@ from Evolution_Calculation import AQCSystem, simple_time_schedule, optimal_time_
 class RotatingState(Scene):
     def construct(self):
         #Plug in the numbers for a0
-        n = 35
+        n = 100
         tf0 = 200
         tf1 = 100
-        dimless_time_lis0,dimless_time_lis1 = generate_dimless_timelis([tf0,tf1],850)
+        dimless_time_lis0,dimless_time_lis1 = generate_dimless_timelis([tf0,tf1],1000)
         init_state = qt.Qobj([[np.sqrt(1 / n)], [np.sqrt((n - 1) / n)]])
         hmlta = qt.Qobj([[1-1/n, -np.sqrt(n-1)/n], [-np.sqrt(n-1)/n, 1-(n-1)/n]])
         hmltb = qt.Qobj([[0,0], [0,1]])
@@ -122,12 +122,12 @@ class RotatingState(Scene):
         def update_plot0(mob):
             if self.now_at+1<=self.len0:
                 t_lis=dimless_time_lis0[0:self.now_at+1]
-                mob.become(axes0plot.plot(lambda x:30*np.interp(x,t_lis,self.err0abs[0:self.now_at+1]),x_range=(t_lis[0],t_lis[-1]+0.01,0.001)))
+                mob.become(axes0plot.plot(lambda x:5*np.interp(x,t_lis,self.err0abs[0:self.now_at+1]),x_range=(t_lis[0],t_lis[-1]+0.01,0.001)))
         graph0.add_updater(update_plot0)
         def update_plot1(mob):
             if self.now_at+1<=self.len1:
                 t_lis=dimless_time_lis1[0:self.now_at+1]
-                mob.become(axes1plot.plot(lambda x:30*np.interp(x,t_lis,self.err1abs[0:self.now_at+1]),x_range=(t_lis[0],t_lis[-1]+0.01,0.001)))
+                mob.become(axes1plot.plot(lambda x:5*np.interp(x,t_lis,self.err1abs[0:self.now_at+1]),x_range=(t_lis[0],t_lis[-1]+0.01,0.001)))
         graph1.add_updater(update_plot1)
 
 
@@ -136,6 +136,7 @@ class RotatingState(Scene):
         graph1gap = axes1plot.plot(lambda x: x, x_range=[])
         self.add(graph0gap)
         self.add(graph1gap)
+
         def update_plot0gap(mob):
             if self.now_at+1<=self.len0:
                 t_lis=dimless_time_lis0[0:self.now_at+1]
