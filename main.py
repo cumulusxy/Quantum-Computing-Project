@@ -12,6 +12,12 @@ class RotatingState(Scene):
         tf1 = 100
         dimless_time_lis0,dimless_time_lis1 = generate_dimless_timelis([tf0,tf1],1000)
         init_state = qt.Qobj([[np.sqrt(1 / n)], [np.sqrt((n - 1) / n)]])
+        """
+        hmlta: initial hamiltonian
+        starts in 1-|\phi><\phi| where \phi is a phase state
+        the state stays in the state spanned by |\phi> and |m>, where |m> is the 'target' state, a two dimensional hilbert space
+        so you can implement hmlta by finding <m|hmlta|m>, <m|hmlta|m^(ortho)>, <m^(ortho)|hmlta|m>, <m^(ortho)|hmlta|m^(ortho)>
+        """
         hmlta = qt.Qobj([[1-1/n, -np.sqrt(n-1)/n], [-np.sqrt(n-1)/n, 1-(n-1)/n]])
         hmltb = qt.Qobj([[0,0], [0,1]])
 
