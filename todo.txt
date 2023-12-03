@@ -1,0 +1,11 @@
+2023.11.27
+come up with code to find the transition matrix for the complete matrix
+code to come up with google matrix
+code to get the hamiltonian
+
+optional: schedule optimization
+
+eigenvalue for the small network
+
+small error yet different tf
+same error yet small tf
